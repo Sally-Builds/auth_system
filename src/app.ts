@@ -1,14 +1,28 @@
 import express, {Application} from 'express'
 import cors from 'cors'
+import { IController } from './controllers';
 
 
 class App {
     private PORT;
     public app: Application
     
-    constructor(port: string){
+    constructor(controller: IController[], port: string){
         this.PORT = port;
         this.app = express();
+        this.initializeMiddlewares();
+        this.initializeControllers(controller);
+    }
+
+    private initializeMiddlewares() {
+        this.app.use(cors())
+        this.app.use(express.json())
+    }
+
+    private initializeControllers(controllers: IController[]) {
+        controllers.map((controller: IController) => {
+            this.app.use(controller.path, controller.router);
+        });
     }
 
     listen(){
